@@ -6,6 +6,12 @@ var app = builder.Build();
 
 DataLayer dl = new DataLayer();
 
+app.UseHttpsRedirection();
+//***************************
+// Serve wwwroot/index.html at "/" and other static assets
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 // Get all departments
 app.MapGet("/departments", () =>
 {

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Department Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h2, h3 {
+            color: #333;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 60%;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #333;
+            padding: 8px;
+            text-align: center;
+        }
+
+        input {
+            margin: 5px;
+            padding: 5px;
+        }
+
+        button {
+            margin: 5px;
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+
+        .actions {
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Department Management</h2>
+
+    <div class="actions">
+        <label>Department ID: <input type="number" id="deptId" placeholder="Enter ID"></label>
+        <label>Department Name: <input type="text" id="deptName" placeholder="Enter Name"></label>
+        <button onclick="createDept()">Create</button>
+        <button onclick="updateDept()">Update</button>
+    </div>
+
+    <h3>Departments List</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody id="deptTable"></tbody>
+    </table>
+
+    <script>
+        // ✅ FIX: Use relative API URL so it works with your server base
+        const apiUrl = "/departments";
+
+        // ✅ Load all departments
+        async function loadDepts() {
+            try {
+                const res = await fetch(apiUrl);
+                if (!res.ok) throw new Error("Failed to load departments");
+                const data = await res.json();
+                const tbody = document.getElementById("deptTable");
+                tbody.innerHTML = "";
+                data.forEach(d => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `
+                            <td>${d.department_ID}</td>
+                            <td>${d.department_Name}</td>
+                            <td><button onclick="deleteDept(${d.department_ID})">Delete</button></td>
+                        `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error(error);
+                alert("Error loading departments");
+            }
+        }
+
+        // ✅ Create new department
+        async function createDept() {
+            const id = document.getElementById("deptId").value;
+            const name = document.getElementById("deptName").value;
+            if (!id || !name) {
+                alert("Please enter ID and Name");
+                return;
+            }
+            await fetch(apiUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ department_ID: Number(id), department_Name: name })
+            });
+            clearFields();
+            loadDepts();
+        }
+
+        // ✅ Update department
+        async function updateDept() {
+            const id = document.getElementById("deptId").value;
+            const name = document.getElementById("deptName").value;
+            if (!id || !name) {
+                alert("Please enter ID and Name for update");
+                return;
+            }
+            await fetch(`${apiUrl}/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ department_ID: Number(id), department_Name: name })
+            });
+            clearFields();
+            loadDepts();
+        }
+
+        // ✅ Delete department
+        async function deleteDept(id) {
+            if (!confirm("Are you sure you want to delete this department?")) return;
+            await fetch(`${apiUrl}/${id}`, { method: "DELETE" });
+            loadDepts();
+        }
+
+        function clearFields() {
+            document.getElementById("deptId").value = "";
+            document.getElementById("deptName").value = "";
+        }
+
+        loadDepts(); // ✅ Initial load
+    </script>
+</body>
+</html>

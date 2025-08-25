@@ -7,7 +7,7 @@ namespace CompanyWebApp_Core
 {
     public class DataLayer
     {
-        private string connectionString = "Data Source=DIVYANSHOO\\SQLEXPRESS;Initial Catalog=Company;Integrated Security=True;";
+        private string connectionString = "Data Source=10.201.1.173\\ERP,1433;Initial Catalog=MA_TRAINING;Integrated Security=True;";
 
         // Get all departments
         public IEnumerable<Dept> GetDepts()
